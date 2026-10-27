@@ -5,78 +5,415 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HWiNFO Dashboard - {{ filename }}</title>
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
     <style>
-        :root { --bg: #f4f6f8; --card: #fff; --text: #2d3748; --muted: #718096; --border: #e2e8f0; --accent: #3182ce; --red: #e53e3e; }
+        :root {
+            --bg: #f4f6f8;
+            --card: #fff;
+            --text: #2d3748;
+            --muted: #718096;
+            --border: #e2e8f0;
+            --accent: #3182ce;
+            --red: #e53e3e;
+        }
+
         * { box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; line-height: 1.5; }
 
-        .header { background: var(--card); padding: 20px 24px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .container { max-width: 1400px; margin: 0 auto; }
-        h1 { margin: 0 0 6px; font-size: 22px; }
-        .meta { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            line-height: 1.5;
+        }
 
-        .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-        .badge { display: inline-flex; align-items: center; gap: 6px; background: #edf2f7; border-radius: 6px; padding: 5px 10px; font-size: 12px; }
-        .badge-prefix { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
-        .badge-name { color: var(--text); font-weight: 500; }
+        .header {
+            background: var(--card);
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
 
-        .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
-        .tab-btn { background: transparent; border: 1px solid var(--border); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text); transition: all 0.15s; }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin: 0 0 6px;
+            font-size: 22px;
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
         .tab-btn:hover { background: #edf2f7; }
-        .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
 
-        .controls { max-width: 1400px; margin: 0 auto; padding: 16px 24px 0; display: flex; gap: 10px; flex-wrap: wrap; }
-        .btn { display: inline-flex; align-items: center; gap: 6px; background: var(--accent); color: white; padding: 9px 16px; border-radius: 6px; border: none; text-decoration: none; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+        .tab-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .controls {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px 24px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--accent);
+            color: white;
+            padding: 9px 16px;
+            border-radius: 6px;
+            border: none;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
         .btn:hover { background: #2b6cb0; }
-        .btn-secondary { background: #edf2f7; color: var(--text); }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--text);
+        }
+
         .btn-secondary:hover { background: #e2e8f0; }
 
-        .content { padding: 20px 24px; max-width: 1400px; margin: 0 auto; }
+        .content {
+            padding: 20px 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
         .category-section { display: none; }
         .category-section.active { display: block; }
 
-        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .card { background: var(--card); border-radius: 8px; padding: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid var(--border); }
+        .summary-card {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 16px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
 
-        .table-container { background: var(--card); border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid var(--border); overflow-x: auto; max-height: 70vh; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
-        th, td { padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-        th { background: #f7fafc; font-weight: 600; color: var(--muted); position: sticky; top: 0; z-index: 1; font-size: 12px; }
+        .summary-card h2 {
+            margin-top: 0;
+            font-size: 16px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .summary-card ul {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 14px;
+        }
+
+        .summary-card li { margin-bottom: 6px; }
+
+        .charts-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+            width: 100%;
+            min-width: 0;
+        }
+
+        .table-container {
+            background: var(--card);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+            overflow-x: auto;
+            max-height: 70vh;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: var(--muted);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            font-size: 12px;
+        }
+
         tr:hover td { background: #f7fafc; }
-        .num { text-align: right; font-variant-numeric: tabular-nums; }
-        .text-red { color: var(--red); font-weight: 700; }
-        h2 { font-size: 18px; margin: 20px 0 12px; }
 
-        @media (max-width: 700px) { .charts-grid { grid-template-columns: 1fr; } }
+        .num {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
 
+        .text-red {
+            color: var(--red);
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin: 20px 0 12px;
+        }
+
+        /* ПЕЧАТЬ И PDF */
         @media print {
-            .tabs, .controls, .tab-btn { display: none !important; }
-            .category-section { display: block !important; page-break-before: always; }
-            .category-section:first-of-type { page-break-before: auto; }
-            .charts-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
-            .card { break-inside: avoid; }
-            body { padding: 0; background: white; }
-            .header { position: static; box-shadow: none; padding: 12px 0; border-bottom: 2px solid #000; }
-            h2 { margin-top: 16px; page-break-after: avoid; font-size: 16px; }
-            table { font-size: 10px; }
-            th, td { padding: 6px 8px; }
-            .table-container { max-height: none; overflow: visible; box-shadow: none; border: 1px solid #ccc; }
+            @page {
+                size: A4 landscape;
+                margin: 8mm;
+            }
+
+            html, body {
+                width: auto !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+                overflow: visible !important;
+            }
+
+            .tabs, .controls, .tab-btn {
+                display: none !important;
+            }
+
+            .header {
+                position: static !important;
+                padding: 8px 0 !important;
+                box-shadow: none !important;
+                border-bottom: 1px solid #999 !important;
+            }
+
+            .container, .content {
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            /*
+             * ВАЖНО:
+             * Не делаем page-break-before для каждой категории.
+             * Категории идут друг за другом без пустых страниц.
+             */
+            .category-section,
+            .category-section.active {
+                display: block !important;
+                visibility: visible !important;
+                height: auto !important;
+                overflow: visible !important;
+                page-break-before: auto !important;
+                break-before: auto !important;
+                page-break-after: auto !important;
+                break-after: auto !important;
+            }
+
+            .charts-grid {
+                display: block !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+
+            /*
+             * Не запрещаем разрыв карточки целиком:
+             * браузер сможет переносить содержимое, если оно
+             * не помещается на оставшуюся часть страницы.
+             */
+            .card {
+                display: block !important;
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0 0 5mm 0 !important;
+                padding: 2mm !important;
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+                overflow: visible !important;
+
+                page-break-inside: auto !important;
+                break-inside: auto !important;
+            }
+
+            .js-plotly-plot,
+            .plot-container,
+            .svg-container {
+                max-width: 100% !important;
+            }
+
+            .js-plotly-plot {
+                width: 100% !important;
+                overflow: visible !important;
+            }
+
+            /*
+             * График не должен ужиматься до нулевой высоты.
+             * Размер дополнительно задаётся в buildLayout().
+             */
+            .js-plotly-plot .main-svg {
+                overflow: visible !important;
+            }
+
+            h2 {
+                font-size: 14px !important;
+                margin: 5mm 0 2mm !important;
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+
+            .summary-card {
+                padding: 3mm !important;
+                margin-bottom: 4mm !important;
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                page-break-inside: auto !important;
+                break-inside: auto !important;
+            }
+
+            .summary-card h2 {
+                margin-top: 0 !important;
+            }
+
+            .table-container {
+                max-height: none !important;
+                height: auto !important;
+                overflow: visible !important;
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                margin-bottom: 4mm !important;
+                page-break-inside: auto !important;
+                break-inside: auto !important;
+            }
+
+            table {
+                width: 100% !important;
+                font-size: 9px !important;
+                border-collapse: collapse !important;
+            }
+
+            thead {
+                display: table-header-group !important;
+            }
+
+            tfoot {
+                display: table-footer-group !important;
+            }
+
+            tr {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            th, td {
+                padding: 3px 5px !important;
+                white-space: normal !important;
+                overflow-wrap: anywhere !important;
+            }
+
+            th {
+                position: static !important;
+            }
+
+            .hardware-list {
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                gap: 4px !important;
+            }
+
+            .hw-badge {
+                padding: 4px 8px !important;
+                min-width: auto !important;
+            }
+
+            body, .card, .table-container, .summary-card,
+            .js-plotly-plot, .js-plotly-plot * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="header">
         <div class="container">
             <h1>Дашборд HWiNFO</h1>
-            <div class="meta">Файл: {{ filename }} | Строк: {{ data_rows }} | Длительность: {{ duration }}</div>
+
+            <div class="meta">
+                Файл: {{ filename }} |
+                Строк: {{ data_rows }} |
+                Длительность: {{ duration }}
+            </div>
 
             {% if hardware %}
-            <div class="badges">
+            <div class="hardware-list">
                 {% for prefix, items in hardware.items() %}
                     {% for name, count in items %}
-                    <div class="badge">
-                        <span class="badge-prefix">{{ prefix }}</span>
-                        <span class="badge-name">{{ name }}{% if count > 1 %} × {{ count }}{% endif %}</span>
+                    <div class="hw-badge">
+                        <span class="hw-prefix">{{ prefix }}</span>
+                        <span class="hw-name">
+                            {{ name }}
+                            {% if count > 1 and prefix not in ('Система', 'ЦП', 'dGPU') %}
+                                <span style="color:#a0aec0;font-size:12px;margin-left:4px;">
+                                    ×{{ count }}
+                                </span>
+                            {% endif %}
+                        </span>
                     </div>
                     {% endfor %}
                 {% endfor %}
@@ -85,9 +422,12 @@
 
             <div class="tabs">
                 {% for cat_name in categories.keys() %}
-                <button class="tab-btn {% if loop.first %}active{% endif %}"
-                        data-cat="{{ cat_name }}"
-                        onclick="switchTab(this)">{{ cat_name }}</button>
+                <button
+                    class="tab-btn {% if loop.first %}active{% endif %}"
+                    data-cat="{{ cat_name }}"
+                    onclick="switchTab(this)">
+                    {{ cat_name }}
+                </button>
                 {% endfor %}
             </div>
         </div>
@@ -99,14 +439,28 @@
     </div>
 
     <div class="content">
+        <div class="summary-card">
+            <h2>Краткий вывод по системе</h2>
+            <ul>
+                {% for line in system_summary %}
+                <li>{{ line|safe }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
         {% for cat_name, cat_data in categories.items() %}
-        <div id="cat-{{ cat_name }}" class="category-section {% if loop.first %}active{% endif %}">
+        <div
+            id="cat-{{ cat_name }}"
+            class="category-section {% if loop.first %}active{% endif %}">
+
             <h2>{{ cat_name }}</h2>
 
             {% if cat_data.charts %}
             <div class="charts-grid">
                 {% for chart in cat_data.charts %}
-                <div class="card"><div id="{{ chart.id }}"></div></div>
+                <div class="card">
+                    <div id="{{ chart.id }}"></div>
+                </div>
                 {% endfor %}
             </div>
             {% endif %}
@@ -114,11 +468,17 @@
             {% if cat_data.table %}
             <div class="table-container">
                 <table>
-                    <thead><tr>
-                        <th>Параметр</th><th class="num">Среднее</th><th class="num">Мин</th>
-                        <th class="num">Макс</th><th class="num">Стд. откл.</th>
-                        <th class="num">Да</th><th class="num">Нет</th>
-                    </tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Параметр</th>
+                            <th class="num">Среднее</th>
+                            <th class="num">Мин</th>
+                            <th class="num">Макс</th>
+                            <th class="num">Стд. откл.</th>
+                            <th class="num">Да</th>
+                            <th class="num">Нет</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         {% for row in cat_data.table %}
                         <tr>
@@ -127,7 +487,9 @@
                             <td class="num">{{ row.min }}</td>
                             <td class="num">{{ row.max }}</td>
                             <td class="num">{{ row.std }}</td>
-                            <td class="num {% if row.yes|int > 0 %}text-red{% endif %}">{{ row.yes }}</td>
+                            <td class="num {% if row.yes|int > 0 %}text-red{% endif %}">
+                                {{ row.yes }}
+                            </td>
                             <td class="num">{{ row.no }}</td>
                         </tr>
                         {% endfor %}
@@ -147,89 +509,286 @@
             return chart.traces.map(t => ({
                 x: GLOBAL_TS,
                 y: t.data,
-                name: chart.traces.length > 1 ? `${t.name} (${t.stats})` : t.name,
+                name: chart.traces.length > 1
+                    ? `${t.name} (${t.stats})`
+                    : t.name,
                 mode: 'lines',
-                line: { color: t.color, width: 1.8 },
+                line: {
+                    color: t.color,
+                    width: 1.8
+                },
                 yaxis: t.yaxis || 'y',
-                hovertemplate: '<b>%{y:.1f}</b><extra>' + t.name + '</extra>',
+                hovertemplate:
+                    '<b>%{y:.1f}</b><extra>' + t.name + '</extra>'
             }));
         }
 
-        function buildLayout(chart) {
+        function buildLayout(chart, isPrint = false) {
             const single = chart.traces.length === 1;
+
             const subtitle = single && chart.traces[0].stats
-                ? `<br><span style="font-size:11px;color:#888">${chart.traces[0].stats}</span>`
+                ? `<br><span style="font-size:11px;color:#888">${
+                    chart.traces[0].stats
+                  }</span>`
                 : '';
 
             const layout = {
-                title: { text: chart.title + subtitle, x: 0, xanchor: 'left',
-                         font: { size: 14, color: '#2d3748' } },
-                margin: { l: 55, r: chart.dual_axis ? 55 : 20, t: 55, b: 45 },
-                xaxis: { type: 'date', gridcolor: '#f0f0f0', showline: true, linecolor: '#ddd' },
-                yaxis: { title: chart.ylabel, gridcolor: '#f0f0f0', zeroline: false },
+                autosize: true,
+                title: {
+                    text: chart.title + subtitle,
+                    x: 0,
+                    xanchor: 'left',
+                    font: {
+                        size: isPrint ? 12 : 14,
+                        color: '#2d3748'
+                    }
+                },
+                margin: {
+                    l: 65,
+                    r: chart.dual_axis ? 65 : 25,
+                    t: 55,
+                    b: 45
+                },
+                xaxis: {
+                    type: 'date',
+                    gridcolor: '#f0f0f0',
+                    showline: true,
+                    linecolor: '#ddd',
+                    automargin: true
+                },
+                yaxis: {
+                    title: chart.ylabel,
+                    gridcolor: '#f0f0f0',
+                    zeroline: false,
+                    automargin: true
+                },
                 hovermode: 'x unified',
                 showlegend: chart.traces.length > 1,
-                legend: { x: 1, y: 1, xanchor: 'right', yanchor: 'top',
-                          font: { size: 11 }, bgcolor: 'rgba(255,255,255,0.85)' },
-                height: 300,
+                legend: {
+                    x: 1,
+                    y: 1,
+                    xanchor: 'right',
+                    yanchor: 'top',
+                    font: { size: 10 },
+                    bgcolor: 'rgba(255,255,255,0.85)'
+                },
+                /*
+                 * Одна полноценная широкая диаграмма.
+                 * Не уменьшаем высоту для попытки уместить
+                 * несколько графиков на одной странице.
+                 */
+                height: isPrint ? 440 : 400,
                 plot_bgcolor: '#fff',
-                paper_bgcolor: '#fff',
+                paper_bgcolor: '#fff'
             };
 
             if (chart.dual_axis) {
-                layout.yaxis2 = { title: chart.y2label, overlaying: 'y', side: 'right',
-                                   gridcolor: 'transparent', range: [0, 105] };
+                layout.yaxis2 = {
+                    title: chart.y2label,
+                    overlaying: 'y',
+                    side: 'right',
+                    gridcolor: 'transparent',
+                    range: [0, 105],
+                    automargin: true
+                };
             }
+
             return layout;
         }
 
         CHARTS.forEach(chart => {
             const el = document.getElementById(chart.id);
-            if (el) Plotly.newPlot(el, buildTraces(chart), buildLayout(chart),
-                                   { responsive: true, displayModeBar: false });
+
+            if (el) {
+                Plotly.newPlot(
+                    el,
+                    buildTraces(chart),
+                    buildLayout(chart, false),
+                    {
+                        responsive: true,
+                        displayModeBar: false
+                    }
+                );
+            }
         });
 
         function switchTab(btn) {
             const cat = btn.dataset.cat;
-            document.querySelectorAll('.category-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('cat-' + cat).classList.add('active');
+
+            document.querySelectorAll('.category-section')
+                .forEach(el => el.classList.remove('active'));
+
+            document.querySelectorAll('.tab-btn')
+                .forEach(el => el.classList.remove('active'));
+
+            const section = document.getElementById('cat-' + cat);
+
+            if (section) {
+                section.classList.add('active');
+            }
+
             btn.classList.add('active');
+
             CHARTS.filter(c => c.category === cat).forEach(c => {
                 const el = document.getElementById(c.id);
-                if (el) Plotly.Plots.resize(el);
+
+                if (el) {
+                    Plotly.Plots.resize(el);
+                }
             });
         }
 
-        let printingRestore = null;
-        window.addEventListener('afterprint', () => {
-            if (printingRestore) { printingRestore(); printingRestore = null; }
+        window.addEventListener('resize', () => {
+            CHARTS.forEach(c => {
+                const el = document.getElementById(c.id);
+
+                if (el && el.offsetParent !== null) {
+                    Plotly.Plots.resize(el);
+                }
+            });
         });
 
+        /*
+         * Печать:
+         * 1. Показываем все категории.
+         * 2. Перерисовываем все графики.
+         * 3. Ждём завершения рендеринга.
+         * 4. Открываем окно печати.
+         * 5. Восстанавливаем исходный вид после печати.
+         */
+        let isPrinting = false;
+        let previousPrintState = null;
+
+        function wait(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
         async function exportPDF() {
+            if (isPrinting) return;
+            isPrinting = true;
+
             const activeBtn = document.querySelector('.tab-btn.active');
             const activeCat = activeBtn ? activeBtn.dataset.cat : null;
 
-            document.querySelectorAll('.category-section').forEach(el => el.classList.add('active'));
-            await new Promise(r => setTimeout(r, 200));
+            const sections = [
+                ...document.querySelectorAll('.category-section')
+            ];
 
-            for (const c of CHARTS) {
-                const el = document.getElementById(c.id);
-                if (el) await Plotly.Plots.resize(el);
+            const originalStates = new Map();
+
+            sections.forEach(section => {
+                originalStates.set(
+                    section,
+                    section.classList.contains('active')
+                );
+
+                section.classList.add('active');
+            });
+
+            const originalWidths = new Map();
+
+            CHARTS.forEach(chart => {
+                const el = document.getElementById(chart.id);
+
+                if (el) {
+                    originalWidths.set(chart.id, el.style.width);
+                    el.style.width = '100%';
+                }
+            });
+
+            try {
+                // Даём браузеру пересчитать размеры раскрытых категорий.
+                await wait(300);
+
+                // Перерисовываем графики с размерами для печати.
+                for (const chart of CHARTS) {
+                    const el = document.getElementById(chart.id);
+
+                    if (!el) continue;
+
+                    await Plotly.react(
+                        el,
+                        buildTraces(chart),
+                        buildLayout(chart, true),
+                        {
+                            responsive: false,
+                            displayModeBar: false
+                        }
+                    );
+
+                    await Plotly.Plots.resize(el);
+                }
+
+                // Ожидаем, пока браузер применит стили печати.
+                await wait(500);
+
+                previousPrintState = {
+                    activeCat,
+                    originalStates,
+                    originalWidths
+                };
+
+                window.print();
+            } catch (err) {
+                console.error('Ошибка подготовки PDF:', err);
+                alert('Не удалось подготовить PDF. Подробности в консоли браузера.');
+                restoreDashboard();
             }
-            await new Promise(r => setTimeout(r, 150));
-
-            printingRestore = () => {
-                document.querySelectorAll('.category-section').forEach(el => {
-                    if (el.id !== 'cat-' + activeCat) el.classList.remove('active');
-                });
-                CHARTS.forEach(c => {
-                    const el = document.getElementById(c.id);
-                    if (el) Plotly.Plots.resize(el);
-                });
-            };
-            window.print();
         }
+
+        function restoreDashboard() {
+            if (!previousPrintState) {
+                isPrinting = false;
+                return;
+            }
+
+            const {
+                activeCat,
+                originalStates,
+                originalWidths
+            } = previousPrintState;
+
+            document.querySelectorAll('.category-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            if (activeCat) {
+                const activeSection = document.getElementById('cat-' + activeCat);
+
+                if (activeSection) {
+                    activeSection.classList.add('active');
+                }
+            } else {
+                const first = document.querySelector('.category-section');
+
+                if (first) first.classList.add('active');
+            }
+
+            CHARTS.forEach(chart => {
+                const el = document.getElementById(chart.id);
+
+                if (!el) return;
+
+                el.style.width = originalWidths.get(chart.id) || '';
+
+                Plotly.react(
+                    el,
+                    buildTraces(chart),
+                    buildLayout(chart, false),
+                    {
+                        responsive: true,
+                        displayModeBar: false
+                    }
+                );
+            });
+
+            previousPrintState = null;
+            isPrinting = false;
+        }
+
+        window.addEventListener('afterprint', () => {
+            setTimeout(restoreDashboard, 300);
+        });
     </script>
 </body>
 </html>
